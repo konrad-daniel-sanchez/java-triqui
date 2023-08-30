@@ -6,6 +6,9 @@ public class Tablero {
 
         // Parámetros del juego:
         int TAMANO = 3;
+        char SIMBOLO_JUGADOR_A = 'X';
+        char SIMBOLO_JUGADOR_B = 'O';
+        boolean esTurnoJugadorA = true;
 
         // Tablero:
         char[][] matriz = new char[TAMANO][TAMANO];
@@ -20,12 +23,15 @@ public class Tablero {
 
         // Reglas del juego:
         while(true){
+            char simbolo = SIMBOLO_JUGADOR_A;
+            if(!esTurnoJugadorA)
+                simbolo = SIMBOLO_JUGADOR_B;
             System.out.println("Ingresa tu posición (x)");
             int x = lector.nextInt();
             System.out.println("Ingresa tu posición (y)");
             int y = lector.nextInt();
 
-            matriz[y][x] = 'X';
+            matriz[y][x] = simbolo;
 
             // Imprimir matriz:
             for(int i=0; i<matriz.length; i++){
@@ -34,6 +40,7 @@ public class Tablero {
                 }
                 System.out.println();
             }
+            esTurnoJugadorA = !esTurnoJugadorA;
         }
     }
 }
