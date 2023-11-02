@@ -8,7 +8,7 @@
  * El tablero del juego es representado por una matriz (array bidimensional) de caracteres.
  * Cada celda de la matriz contiene un carácter que puede ser 'X', 'O' o espacio en blanco ' '.
  *
- * Los parámetros del juego se definen al comienzo del método main, como el tamaño del tablero (TAMANO),
+ * Los parámetros del juego se definen al comienzo del método main, como el tamaño del tablero (tamano),
  * los símbolos para los jugadores A y B (SIMBOLO_JUGADOR_A y SIMBOLO_JUGADOR_B respectivamente),
  * la información sobre si es el turno del jugador A (esTurnoJugadorA), una posición en el tablero (coordenadas x e y),
  * el símbolo actual a evaluar (simbolo) y una variable para indicar si ha ocurrido un triqui (esTriqui).
@@ -30,78 +30,138 @@
  * Finalmente, el código imprime el tablero del juego y muestra un mensaje indicando si se ha formado un triqui o no.
  */
 
+/**
+ * Clase Evaluador de Triqui
+ * Dada una posición, evalúa si alguno de los jugadores completó un triqui.
+ */
 public class Evaluador {
-    public static void main(String[] args) {
-        // Parámetros del juego:
-        int TAMANO = 3;
-        char SIMBOLO_JUGADOR_A = 'X';
-        char SIMBOLO_JUGADOR_B = 'O';
-        boolean esTurnoJugadorA = true;
-        int x = 2;
-        int y = 2;
-        char simbolo = SIMBOLO_JUGADOR_A;
-        boolean esTriqui = false;
+    /**************************************************************************
+     * Atributos
+     **************************************************************************/
+    private int tamano;
+    /**************************************************************************
+     * Métodos
+     **************************************************************************/
 
-        if(!esTurnoJugadorA)
-            simbolo = SIMBOLO_JUGADOR_B;
+    /**
+     * Constructor de la clase Evaluador
+     * @param tamano Tamaño de las filas y columnas (es un tablero cuadrado).
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public Evaluador(int tamano) {
+        this.tamano = tamano;
+    }
 
-        // Tablero:
-        char[][] matriz = {
-                {'X', 'O', 'O'},
-                {' ', 'X', ' '},
-                {' ', ' ', 'X'}
-        };
-
+    /**
+     * Método que verifica si hay un triqui en la línea horizontal.
+     * @param matriz Matriz del tablero.
+     * @param simbolo Símbolo del jugador actual.
+     * @param y Posición en la fila.
+     * @return true si hay un triqui, false de lo contrario.
+     *
+     * Complejidad Temporal: O(N) Complejidad Lineal.
+     */
+    private boolean verificarHorizontal(char[][] matriz, char simbolo, int y) {
+        // Se verifica la línea horizontal:
         int contador = 0;
-
-        // Verifico la línea horizontal:
         for(int i = 0; i < matriz.length; i++){
             if(matriz[y][i] == simbolo){
                 contador += 1;
             }
         }
-        esTriqui = (contador == 3);
-        // Verifico la línea vertical:
-        if(!esTriqui){
-            contador = 0;
-            for(int i = 0; i < matriz.length; i++){
-                if(matriz[i][x] == simbolo){
+        return (contador == 3);
+    }
+
+    /**
+     * Método que verifica si hay un triqui en la línea vertical.
+     * @param matriz Matriz del tablero.
+     * @param simbolo Símbolo del jugador actual.
+     * @param x Posición en la columna.
+     * @return true si hay un triqui, false de lo contrario.
+     *
+     * Complejidad Temporal: O(N) Complejidad Lineal.
+     */
+    private boolean verificarVertical(char[][] matriz, char simbolo, int x){
+        // Se verifica la línea vertical:
+        int contador = 0;
+        for(int i = 0; i < matriz.length; i++){
+            if(matriz[i][x] == simbolo){
+                contador += 1;
+            }
+        }
+        return (contador == 3);
+    }
+
+    /**
+     * Método que verifica si hay un triqui en la diagonal principal.
+     * @param matriz Matriz del tablero.
+     * @param simbolo Símbolo del jugador actual.
+     * @param x Posición en la columna.
+     * @param y Posición en la fila.
+     * @return true si hay un triqui, false de lo contrario.
+     *
+     * Complejidad Temporal: O(N) Complejidad Lineal.
+     */
+    private boolean verificarDiagonalPrincipal(char[][] matriz, char simbolo, int x, int y){
+        // Se verifica la diagonal principal:
+        if(x == y) {
+            int contador = 0;
+            for (int i = 0; i < matriz.length; i++) {
+                if (matriz[i][i] == simbolo) {
                     contador += 1;
                 }
             }
-            esTriqui = (contador == 3);
-            // Verifico la diagonal principal:
-            if(x == y && !esTriqui){
-                contador = 0;
-                for(int i = 0; i < matriz.length; i++){
-                    if(matriz[i][i] == simbolo){
-                        contador += 1;
-                    }
-                }
-                esTriqui = (contador == 3);
-                // Verifico la diagonal invertida:
-                if(x + y == TAMANO - 1 && !esTriqui){
-                    contador = 0;
-                    for(int i = 0; i < matriz.length; i++){
-                        if(matriz[i][TAMANO-1-i] == simbolo){
-                            contador += 1;
-                        }
-                    }
-                    esTriqui = (contador == 3);
-                }
-            }
+            return (contador == 3);
         }
+        return false;
+    }
 
-        // Imprimir matriz:
-        for(int i=0; i<matriz.length; i++){
-            for(int j=0; j<matriz[i].length; j++){
-                System.out.print(matriz[i][j] + " ");
+    /**
+     * Método que verifica si hay un triqui en la diagonal invertida.
+     * @param matriz Matriz del tablero.
+     * @param simbolo Símbolo del jugador actual.
+     * @param x Posición en la columna.
+     * @param y Posición en la fila.
+     * @return true si hay un triqui, false de lo contrario.
+     *
+     * Complejidad Temporal: O(N) Complejidad Lineal.
+     */
+    private boolean verificarDiagonalInvertida(char[][] matriz, char simbolo, int x, int y){
+        // Se verifica la diagonal invertida:
+        if(x + y == tamano - 1){
+            int contador = 0;
+            for(int i = 0; i < matriz.length; i++){
+                if(matriz[i][tamano-1-i] == simbolo){
+                    contador += 1;
+                }
             }
-            System.out.println();
+            return (contador == 3);
         }
-        if(esTriqui)
-            System.out.println("Es Triqui");
-        else
-            System.out.println("NO es Triqui");
+        return false;
+    }
+
+    /**
+     * Método que evalúa si un jugador ha formado un triqui.
+     * @param matriz Matriz del tablero.
+     * @param simbolo Símbolo del jugador actual.
+     * @param x Posición en la columna.
+     * @param y Posición en la fila.
+     * @return true si hay un triqui, false de lo contrario.
+     *
+     * Complejidad Temporal: O(N) Complejidad Lineal. (La complejidad más alta de los métodos que se llaman).
+     */
+    public boolean evaluar(char[][] matriz, char simbolo, int x, int y){
+        boolean esTriqui = verificarHorizontal(matriz, simbolo, y);
+        if(!esTriqui) {
+            esTriqui = verificarVertical(matriz, simbolo, x);
+            if(!esTriqui) {
+                esTriqui = verificarDiagonalPrincipal(matriz, simbolo, x, y);
+                if(!esTriqui) {
+                    esTriqui = verificarDiagonalInvertida(matriz, simbolo, x, y);
+                }
+            }
+        }
+        return esTriqui;
     }
 }

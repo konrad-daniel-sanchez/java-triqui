@@ -7,11 +7,11 @@
  *
  * Se crea un objeto Scanner llamado "lector" para permitir la entrada de datos desde la consola.
  *
- * Se definen los parámetros del juego, como el tamaño del tablero (TAMANO), los símbolos para
+ * Se definen los parámetros del juego, como el tamaño del tablero (tamano), los símbolos para
  * los jugadores A y B (SIMBOLO_JUGADOR_A y SIMBOLO_JUGADOR_B respectivamente),
  * y una bandera para indicar si es el turno del jugador A (esTurnoJugadorA).
  *
- * Se inicializa la matriz del tablero con un tamaño de TAMANO x TAMANO,
+ * Se inicializa la matriz del tablero con un tamaño de tamano x tamano,
  * donde cada celda se inicializa con el valor de espacio en blanco (' ').
  *
  * Se imprime la matriz vacía en la consola, mostrando el estado inicial del tablero.
@@ -38,47 +38,120 @@
 import java.util.Scanner;
 
 
+/**
+ * Clase Tablero de Triqui
+ */
 public class Tablero {
-    public static void main(String[] args) {
-        Scanner lector = new Scanner(System.in);
+    /**************************************************************************
+     * Atributos
+     **************************************************************************/
+    private int tamano;
+    private char simboloActual;
+    private char SIMBOLO_JUGADOR_A;
+    private char SIMBOLO_JUGADOR_B;
+    private boolean esTurnoJugadorA;
+    private char[][] matriz;
 
-        // Parámetros del juego:
-        int TAMANO = 3;
-        char SIMBOLO_JUGADOR_A = 'X';
-        char SIMBOLO_JUGADOR_B = 'O';
-        boolean esTurnoJugadorA = true;
+    /**************************************************************************
+     * Métodos
+     **************************************************************************/
 
-        // Tablero:
-        char[][] matriz = new char[TAMANO][TAMANO];
+    /**
+     * Constructor de la clase Tablero
+     * @param tamano: Tamaño de las filas y columnas (es un tablero cuadrado).
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public Tablero(int tamano){
+        this.tamano = tamano;
+        this.SIMBOLO_JUGADOR_A = 'X';
+        this.SIMBOLO_JUGADOR_B = 'O';
+        this.esTurnoJugadorA = true;
+        this.matriz = new char[tamano][tamano];
+    }
 
-        // Imprimir matriz:
-        for(int i=0; i<matriz.length; i++){
-            for(int j=0; j<matriz[i].length; j++){
-                System.out.print(matriz[i][j] + " ");
-            }
-            System.out.println();
-        }
+    /**
+     * Método get para obtener la matriz del tablero.
+     * @return La matriz del tablero.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public char[][] getMatrix(){
+        return matriz;
+    }
 
-        // Reglas del juego:
-        while(true){
-            char simbolo = SIMBOLO_JUGADOR_A;
-            if(!esTurnoJugadorA)
-                simbolo = SIMBOLO_JUGADOR_B;
-            System.out.println("Ingresa tu posición (x)");
-            int x = lector.nextInt();
-            System.out.println("Ingresa tu posición (y)");
-            int y = lector.nextInt();
+    /**
+     * Método get para obtener si es el turno del jugador A.
+     * @return Booleano que indica el turno del jugador A.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public boolean isEsTurnoJugadorA() {
+        return esTurnoJugadorA;
+    }
 
-            matriz[y][x] = simbolo;
+    /**
+     * Método get para obtener el símbolo actual del jugador.
+     * @return El símbolo del jugador actual.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public char getSimboloActual() {
+        return simboloActual;
+    }
 
-            // Imprimir matriz:
-            for(int i=0; i<matriz.length; i++){
-                for(int j=0; j<matriz[i].length; j++){
-                    System.out.print(matriz[i][j] + " ");
-                }
-                System.out.println();
-            }
+    /**
+     * Método que verifica si una coordenada se enncuentra dentro de los límites del tablero.
+     * @param coordenada (número entero x o y)
+     * @return Booleano que indica si la coordenada es válida.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    private boolean verficarCoordenada(int coordenada) {
+        return coordenada >= 0 && coordenada < this.tamano;
+    }
+
+    /**
+     * Método que verifica si una casilla está vacía.
+     * @param x Coordenada x de la casilla.
+     * @param y Coordenada y de la casilla.
+     * @return Booleano que indica si la casilla está vacía.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    private boolean verificarCasillaVacia(int x, int y) {
+        return !(matriz[y][x] == SIMBOLO_JUGADOR_A || matriz[y][x] == SIMBOLO_JUGADOR_B);
+    }
+
+    /**
+     * Método que cambia el símbolo actual del jugador.
+     * Si es el turno del jugador A, el símbolo actual es X, de lo contrario es O.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    private void cambiarSimboloActual() {
+        this.simboloActual = SIMBOLO_JUGADOR_A;
+        if (!esTurnoJugadorA)
+            this.simboloActual = SIMBOLO_JUGADOR_B;
+    }
+
+    /**
+     * Método que permite a un jugador jugar un movimiento en una casilla.
+     * @param x Coordenada x de la casilla.
+     * @param y Coordenada y de la casilla.
+     * @return Booleano que indica si el movimiento fue exitoso.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public boolean jugar(int x, int y) {
+        if(verficarCoordenada(x) && verficarCoordenada(y) && verificarCasillaVacia(x, y)) {
+            cambiarSimboloActual();
+
+            matriz[y][x] = this.simboloActual;
+
             esTurnoJugadorA = !esTurnoJugadorA;
+            return true;
         }
+        return false;
     }
 }
