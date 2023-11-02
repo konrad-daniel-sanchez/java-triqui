@@ -1,3 +1,5 @@
+package logicaNegocio;
+
 /**
  * Este código implementa un juego básico de Triqui en la consola,
  * donde los jugadores pueden ingresar sus movimientos alternativamente
@@ -39,7 +41,7 @@ import java.util.Scanner;
 
 
 /**
- * Clase Tablero de Triqui
+ * Clase logicaNegocio.Tablero de Triqui
  */
 public class Tablero {
     /**************************************************************************
@@ -57,7 +59,7 @@ public class Tablero {
      **************************************************************************/
 
     /**
-     * Constructor de la clase Tablero
+     * Constructor de la clase logicaNegocio.Tablero
      * @param tamano: Tamaño de las filas y columnas (es un tablero cuadrado).
      *
      * Complejidad Temporal: O(1) Complejidad Constante.

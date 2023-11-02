@@ -1,3 +1,5 @@
+import logicaNegocio.Evaluador;
+import logicaNegocio.Tablero;
 import java.util.Scanner;
 
 /**

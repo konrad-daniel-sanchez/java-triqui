@@ -1,3 +1,5 @@
+package logicaNegocio;
+
 /**
  * Este código representa la lógica para evaluar si un jugador ha ganado en el juego de Triqui al formar
  * un triplete de su símbolo en filas, columnas o diagonales en un tablero predefinido.
@@ -31,7 +33,7 @@
  */
 
 /**
- * Clase Evaluador de Triqui
+ * Clase logicaNegocio.Evaluador de Triqui
  * Dada una posición, evalúa si alguno de los jugadores completó un triqui.
  */
 public class Evaluador {
@@ -44,7 +46,7 @@ public class Evaluador {
      **************************************************************************/
 
     /**
-     * Constructor de la clase Evaluador
+     * Constructor de la clase logicaNegocio.Evaluador
      * @param tamano Tamaño de las filas y columnas (es un tablero cuadrado).
      *
      * Complejidad Temporal: O(1) Complejidad Constante.
