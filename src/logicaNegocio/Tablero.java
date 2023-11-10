@@ -11,7 +11,7 @@ package logicaNegocio;
  *
  * Se definen los parámetros del juego, como el tamaño del tablero (tamano), los símbolos para
  * los jugadores A y B (SIMBOLO_JUGADOR_A y SIMBOLO_JUGADOR_B respectivamente),
- * y una bandera para indicar si es el turno del jugador A (esTurnoJugadorA).
+ * y una bandera para indicar si es el turno del jugador A (turnoJugadorA).
  *
  * Se inicializa la matriz del tablero con un tamaño de tamano x tamano,
  * donde cada celda se inicializa con el valor de espacio en blanco (' ').
@@ -21,7 +21,7 @@ package logicaNegocio;
  * A continuación, se establece un ciclo "while(true)" que representa el flujo del juego,
  * ya que el juego continúa hasta que el ciclo sea interrumpido.
  *
- * Dentro del ciclo, se determina el símbolo del jugador actual en función de la variable "esTurnoJugadorA".
+ * Dentro del ciclo, se determina el símbolo del jugador actual en función de la variable "turnoJugadorA".
  * Si no es el turno del jugador A, se establece el símbolo del jugador B.
  *
  * El juego solicita al jugador actual que ingrese su posición deseada en las coordenadas (x, y).
@@ -34,9 +34,10 @@ package logicaNegocio;
  * del tablero con el símbolo recién colocado.
  *
  * Finalmente, se alterna el turno del jugador actual utilizando el operador de negación ("!")
- * para cambiar el valor de "esTurnoJugadorA".
+ * para cambiar el valor de "turnoJugadorA".
  */
 
+import javax.swing.*;
 import java.util.Scanner;
 
 
@@ -51,13 +52,19 @@ public class Tablero {
     private char simboloActual;
     private char SIMBOLO_JUGADOR_A;
     private char SIMBOLO_JUGADOR_B;
-    private boolean esTurnoJugadorA;
+    private boolean turnoJugadorA;
     private char[][] matriz;
+    private int noMovimientos;
+    private boolean triqui;
+    private boolean finJuego;
+
+    private Evaluador evaluador;
 
     /**************************************************************************
      * Métodos
      **************************************************************************/
 
+    /**************************** CONSTRUCTOR ****************************/
     /**
      * Constructor de la clase logicaNegocio.Tablero
      * @param tamano: Tamaño de las filas y columnas (es un tablero cuadrado).
@@ -68,10 +75,12 @@ public class Tablero {
         this.tamano = tamano;
         this.SIMBOLO_JUGADOR_A = 'X';
         this.SIMBOLO_JUGADOR_B = 'O';
-        this.esTurnoJugadorA = true;
+        this.turnoJugadorA = true;
         this.matriz = new char[tamano][tamano];
+        this.evaluador = new Evaluador(this.tamano);
     }
 
+    /**************************** GETTER ****************************/
     /**
      * Método get para obtener la matriz del tablero.
      * @return La matriz del tablero.
@@ -88,8 +97,8 @@ public class Tablero {
      *
      * Complejidad Temporal: O(1) Complejidad Constante.
      */
-    public boolean isEsTurnoJugadorA() {
-        return esTurnoJugadorA;
+    public boolean isTurnoJugadorA() {
+        return turnoJugadorA;
     }
 
     /**
@@ -102,6 +111,37 @@ public class Tablero {
         return simboloActual;
     }
 
+    /**
+     * Método get para obtener el número de movimientos realizados por ambos jugadores.
+     * @return El número de movimientos realizados.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public int getNoMovimientos() {
+        return noMovimientos;
+    }
+
+    /**
+     * Método get para obtener un booleano que indica si se realizó triqui.
+     * @return Booleano que indica si se realizó triqui.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public boolean isTriqui() {
+        return triqui;
+    }
+
+    /**
+     * Método get para obtener el booleano que indica si el juego se finalizó.
+     * @return Booleano que indica si el juego finalizó.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public boolean isFinJuego() {
+        return finJuego;
+    }
+
+    /**************************** MÉTODOS DE PROPOÓSITO GENERAL ****************************/
     /**
      * Método que verifica si una coordenada se enncuentra dentro de los límites del tablero.
      * @param coordenada (número entero x o y)
@@ -133,7 +173,7 @@ public class Tablero {
      */
     private void cambiarSimboloActual() {
         this.simboloActual = SIMBOLO_JUGADOR_A;
-        if (!esTurnoJugadorA)
+        if (!turnoJugadorA)
             this.simboloActual = SIMBOLO_JUGADOR_B;
     }
 
@@ -146,12 +186,24 @@ public class Tablero {
      * Complejidad Temporal: O(1) Complejidad Constante.
      */
     public boolean jugar(int x, int y) {
+        boolean movimientoValido = false;
+        if(this.noMovimientos < this.tamano * this.tamano && !this.triqui) {
+            movimientoValido = this.realizarMovimiento(x, y);
+            this.triqui = evaluador.evaluar(this.matriz, this.simboloActual, x, y);
+
+            this.noMovimientos += 1;
+            this.finJuego = (this.noMovimientos == this.tamano * this.tamano);
+        }
+        return movimientoValido;
+    }
+
+    private boolean realizarMovimiento(int x, int y) {
         if(verficarCoordenada(x) && verficarCoordenada(y) && verificarCasillaVacia(x, y)) {
             cambiarSimboloActual();
 
             matriz[y][x] = this.simboloActual;
 
-            esTurnoJugadorA = !esTurnoJugadorA;
+            turnoJugadorA = !turnoJugadorA;
             return true;
         }
         return false;

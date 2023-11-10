@@ -41,6 +41,7 @@ public class Evaluador {
      * Atributos
      **************************************************************************/
     private int tamano;
+
     /**************************************************************************
      * Métodos
      **************************************************************************/
@@ -72,7 +73,7 @@ public class Evaluador {
                 contador += 1;
             }
         }
-        return (contador == 3);
+        return (contador == this.tamano);
     }
 
     /**
@@ -92,7 +93,7 @@ public class Evaluador {
                 contador += 1;
             }
         }
-        return (contador == 3);
+        return (contador == this.tamano);
     }
 
     /**
@@ -114,7 +115,7 @@ public class Evaluador {
                     contador += 1;
                 }
             }
-            return (contador == 3);
+            return (contador == this.tamano);
         }
         return false;
     }
@@ -138,7 +139,7 @@ public class Evaluador {
                     contador += 1;
                 }
             }
-            return (contador == 3);
+            return (contador == this.tamano);
         }
         return false;
     }
