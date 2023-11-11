@@ -52,7 +52,12 @@ public class VentanaPrincipal extends JFrame {
              */
             @Override
             public void actionPerformed(ActionEvent e) {
-                TAMANO = Integer.parseInt(txtTamanoTablero.getText());
+                try{
+                    TAMANO = Integer.parseInt(txtTamanoTablero.getText());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "El tamaño del tablero debe ser un número entero");
+                    return;
+                }
                 tablero = new Tablero(TAMANO);
 
                 // Se deshabilitan los controles txtTamanoTablero y btnNuevoJuego
