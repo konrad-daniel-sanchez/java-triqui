@@ -1,6 +1,7 @@
 package presentacion;
 
 import logicaNegocio.Evaluador;
+import logicaNegocio.JuegoAlmacenado;
 import logicaNegocio.Tablero;
 
 import javax.swing.*;
@@ -23,6 +24,8 @@ public class VentanaPrincipal extends JFrame {
     private Tablero tablero;
 
     private int TAMANO;
+
+    private JuegoAlmacenado juegoAlmacenado;
 
     /**
      * Método que inicializa la ventana con todos sus controles de UI.
@@ -60,14 +63,38 @@ public class VentanaPrincipal extends JFrame {
                 }
                 tablero = new Tablero(TAMANO);
 
-                // Se deshabilitan los controles txtTamanoTablero y btnNuevoJuego
-                // Para que el usuario no pueda crear un juego nuevo hasta que se termine el juego en curso
-                txtTamanoTablero.setEnabled(false);
-                btnNuevoJuego.setEnabled(false);
-
-                imprimirMatriz(tablero.getMatrix());
+                iniciarJuego();
             }
         });
+    }
+
+    private void iniciarJuego() {
+        // Se deshabilitan los controles txtTamanoTablero y btnNuevoJuego
+        // Para que el usuario no pueda crear un juego nuevo hasta que se termine el juego en curso
+        txtTamanoTablero.setEnabled(false);
+        btnNuevoJuego.setEnabled(false);
+
+        imprimirMatriz(tablero.getMatrix());
+    }
+
+    private void mostrarVentanaContinuarJuego() {
+        // Se presenta un cuadro de diálogo de confirmación simple con opciones sí y no (JOptionPane.YES_NO_OPTION)
+        int resultadoSiNo = JOptionPane.showConfirmDialog(
+                null,
+                "Tienes un juego almacenado, ¿Deseas continuar con el juego?",
+                "Reanudar juego",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        // Se revisa la elección del usuario
+        if (resultadoSiNo == JOptionPane.YES_OPTION) {
+            // Se ejecuta la acción asociada con Sí
+            tablero = juegoAlmacenado.consultarJuegoAlmacenado();
+            iniciarJuego();
+        } else if (resultadoSiNo == JOptionPane.NO_OPTION || resultadoSiNo == JOptionPane.CLOSED_OPTION) {
+            // Se elimina el registro en la base de datos
+            juegoAlmacenado.eliminarJuegoAlmacenado();
+        }
     }
 
     /**
@@ -80,7 +107,15 @@ public class VentanaPrincipal extends JFrame {
         super("Triqui");
 
         inicializarVentana();
+
+        juegoAlmacenado = new JuegoAlmacenado();
+        boolean existeJuego = juegoAlmacenado.existeJuegoAlmacenado();
+        if(existeJuego) {
+            mostrarVentanaContinuarJuego();
+        }
     }
+
+
 
     /**
      * Método para reiniciar el juego.
@@ -121,6 +156,7 @@ public class VentanaPrincipal extends JFrame {
             JOptionPane.showMessageDialog(this, "Es Triqui!!!!");
 
         if(esTriqui || finJuego) {
+            juegoAlmacenado.eliminarJuegoAlmacenado();
             // Se presenta un cuadro de diálogo de confirmación simple con opciones sí y no (JOptionPane.YES_NO_OPTION)
             int resultadoSiNo = JOptionPane.showConfirmDialog(
                     null,
@@ -150,13 +186,35 @@ public class VentanaPrincipal extends JFrame {
      */
     private void imprimirMatriz(char[][] matriz) {
         JPanel pnlTablero = new JPanel();
+        pnlTablero.setBackground(Color.BLACK);
         pnlTablero.setLayout(new GridLayout(matriz.length, matriz[0].length));
 
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
                 int x = i;
                 int y = j;
-                JButton button = new JButton("" + matriz[j][i]);
+                String texto = "";
+                if (matriz[j][i] == 'X' || matriz[j][i] == 'O')
+                    texto = "" + matriz[j][i];
+                JButton button = new JButton(texto);
+
+                // Establecer estilos y colores
+                button.setFont(new Font("Arial", Font.BOLD, 40));
+                button.setFocusPainted(false);
+                button.setBackground(Color.RED);
+
+
+                // Añadir animación al hacer hover sobre el botón
+                button.addMouseListener(new java.awt.event.MouseAdapter() {
+                    public void mouseEntered(java.awt.event.MouseEvent evt) {
+                        button.setBackground(Color.MAGENTA);
+                    }
+
+                    public void mouseExited(java.awt.event.MouseEvent evt) {
+                        button.setBackground(Color.LIGHT_GRAY);
+                    }
+                });
+
                 button.addActionListener(new ActionListener() {
                     /**
                      * Evento clic de cada botón del juego.

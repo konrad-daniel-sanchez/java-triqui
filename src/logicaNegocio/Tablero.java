@@ -37,6 +37,9 @@ package logicaNegocio;
  * para cambiar el valor de "turnoJugadorA".
  */
 
+import persistencia.DAO.EstadoJuego;
+import persistencia.DAO.EstadoJuegoDAO;
+
 import javax.swing.*;
 import java.util.Scanner;
 
@@ -73,12 +76,40 @@ public class Tablero {
      */
     public Tablero(int tamano){
         this.tamano = tamano;
-        this.SIMBOLO_JUGADOR_A = 'X';
-        this.SIMBOLO_JUGADOR_B = 'O';
+        this.SIMBOLO_JUGADOR_A = 'X';  // Símbolo del jugador A (fijo como 'X').
+        this.SIMBOLO_JUGADOR_B = 'O';  // Símbolo del jugador B (fijo como 'O').
         this.turnoJugadorA = true;
         this.matriz = new char[tamano][tamano];
         this.evaluador = new Evaluador(this.tamano);
     }
+
+    /**
+     * Constructor de la clase Tablero que inicializa un objeto Tablero con los parámetros proporcionados.
+     *
+     * @param tamano Tamaño del tablero.
+     * @param simboloActual Símbolo del jugador actual (X o O).
+     * @param turnoJugadorA Indica si es el turno del jugador A (true) o del jugador B (false).
+     * @param matriz Matriz que representa el estado actual del tablero.
+     * @param noMovimientos Número de movimientos realizados en el juego.
+     * @param triqui Indica si se ha formado un triqui en el tablero.
+     * @param finJuego Indica si el juego ha llegado a su fin.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
+    public Tablero(int tamano, char simboloActual, boolean turnoJugadorA, char[][] matriz, int noMovimientos, boolean triqui, boolean finJuego) {
+        // Inicializa los atributos del objeto Tablero con los valores proporcionados.
+        this.tamano = tamano;
+        this.SIMBOLO_JUGADOR_A = 'X';  // Símbolo del jugador A (fijo como 'X').
+        this.SIMBOLO_JUGADOR_B = 'O';  // Símbolo del jugador B (fijo como 'O').
+        this.simboloActual = simboloActual;
+        this.turnoJugadorA = turnoJugadorA;
+        this.matriz = matriz;
+        this.noMovimientos = noMovimientos;
+        this.triqui = triqui;
+        this.finJuego = finJuego;
+        this.evaluador = new Evaluador(this.tamano);
+    }
+
 
     /**************************** GETTER ****************************/
     /**
@@ -149,7 +180,7 @@ public class Tablero {
      *
      * Complejidad Temporal: O(1) Complejidad Constante.
      */
-    private boolean verficarCoordenada(int coordenada) {
+    private boolean verificarCoordenada(int coordenada) {
         return coordenada >= 0 && coordenada < this.tamano;
     }
 
@@ -194,18 +225,41 @@ public class Tablero {
             this.noMovimientos += 1;
             this.finJuego = (this.noMovimientos == this.tamano * this.tamano);
         }
+
+        // Se almacena el estado del juego en la base de datos:
+        EstadoJuego estadoJuego = new EstadoJuego(tamano, simboloActual, turnoJugadorA, matriz, noMovimientos, triqui, finJuego);
+        EstadoJuegoDAO estadoJuegoDAO = new EstadoJuegoDAO();
+        estadoJuegoDAO.guardar(estadoJuego);
+
         return movimientoValido;
     }
 
+    /**
+     * Realiza un movimiento en el juego del triqui en la posición especificada.
+     *
+     * @param x Coordenada en el eje horizontal.
+     * @param y Coordenada en el eje vertical.
+     * @return true si el movimiento fue exitoso, false si la coordenada no es válida o la casilla no está vacía.
+     *
+     * Complejidad Temporal: O(1) Complejidad Constante.
+     */
     private boolean realizarMovimiento(int x, int y) {
-        if(verficarCoordenada(x) && verficarCoordenada(y) && verificarCasillaVacia(x, y)) {
+        // Verifica que las coordenadas proporcionadas sean válidas.
+        if (verificarCoordenada(x) && verificarCoordenada(y) && verificarCasillaVacia(x, y)) {
+            // Cambia el símbolo actual (X o O).
             cambiarSimboloActual();
 
+            // Asigna el símbolo actual a la posición especificada en la matriz.
             matriz[y][x] = this.simboloActual;
 
+            // Cambia el turno al siguiente jugador.
             turnoJugadorA = !turnoJugadorA;
+
+            // Indica que el movimiento fue exitoso.
             return true;
         }
+        // Indica que el movimiento no fue exitoso.
         return false;
     }
+
 }
